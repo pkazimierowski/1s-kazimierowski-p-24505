@@ -13,10 +13,10 @@ Przed zakończeniem programu wyświetl informację o numerze PID rodzica, dzieck
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <fcntl.h>
+//#include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,63 +24,61 @@ Przed zakończeniem programu wyświetl informację o numerze PID rodzica, dzieck
 int main(int argc, char *argv[])
 {
 
-  if(argc != 2)
+  if(argc != 2) // sprawdzam czy uzytkowinik podal parametr
   {
-
     printf("Brak parametru!\n");
     return 1;
   }
+//definiowanie zmiennych
 
-  char fileName[256] = "zaliczenie/";
-  strcat(fileName, argv[1]);
-  FILE *wp; // wskaźnik do pliku
+  char fName[256] = "zaliczenie/";
+  strcat(fName, argv[1]);
 
-  DIR *dirEtc; // wskaźnik do otwarcia katalogu /etc
-  struct dirent *pDirEtc; // struktura odpowiedzialna za odczyt zawartości katalogu
+  FILE *file;
+
+  DIR *direntEtc;
+  struct dirent *structDirentEtc;
 
   int pid;
-
-
   pid = fork();
 
   if(pid < 0)
   {
-    fprintf(stderr, "Fork Failed \n");
+    fprintf(stderr, "Blad procesu \n");
     exit(1);
   }
   else if(pid == 0)
   {
-  //Tworze katalog "zaliczenie"
   if(mkdir("zaliczenie", 0744)  != 0 && errno != EEXIST)
   {
     perror("mkdir");
     exit(1);
   }
-//otwieram  plik
-  if ((wp = fopen(fileName, "w")) == NULL)
+  file = fopen(fName, "w");
+  if (file  == NULL)
   {
     perror("fopen");
     exit(1);
   }
-//otwieram katolg /etc
-  if((dirEtc = opendir("/etc")) == NULL)
+  direntEtc = opendir("/etc");
+  if(direntEtc == NULL)
   {
     perror("openDir: ");
     exit(1);
   }
-//pętla odczytuje pliki wewnątrz katalogu /etc oraz zapiosuje to do pliku
-  while ((pDirEtc = readdir(dirEtc)) != NULL)
+
+  while ((structDirentEtc = readdir(direntEtc)) != NULL)
   {
-    if(pDirEtc->d_type == DT_REG)
+    if(structDirentEtc->d_type == DT_REG)
     {
-    fputs(pDirEtc->d_name, wp);
-    fputc('\n', wp);
+    fputs(structDirentEtc->d_name, file);
+    fputc('\n', file);
     }
   }
   printf("pid dziecka: %d \npid rodzica: %d\n",getpid(),getppid());
-//zamykanie pliku, katalogu i zamknięcie procesu
-  closedir (dirEtc);
-  fclose(wp);
+
+  closedir(direntEtc);
+  fclose(file);
   exit(0);
 }
 wait(&pid);

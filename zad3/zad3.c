@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
   if(wp2 == NULL)
   {
     perror("fopen");
-    return 2;
+    return 1;
   }
 
   //petla zapisujaca do drugiego pliku
