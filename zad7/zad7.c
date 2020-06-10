@@ -88,5 +88,5 @@ int main(int argc, char *argv[])
   close(fd);
   pause();
 
-  return 1;
+  return 0;
 }
