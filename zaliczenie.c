@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 wait(&pid);
 if (WIFEXITED(pid))
 {
-  if (WEXITSTATUS(pid)){
+  if (WEXITSTATUS(pid) == 0){
  printf("Proces dziecka został zakończony pomyślnie\n");
 }else{
   printf("W procesie dziecka wystąpił błąd\n");
